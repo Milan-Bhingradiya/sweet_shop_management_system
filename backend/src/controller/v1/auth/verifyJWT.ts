@@ -1,7 +1,7 @@
 import type { RequestHandler } from 'express';
 import prisma from '@utils/prisma_connected';
 import { createResponse, type ApiResponse } from '@utils/createResponse';
-import { verifyToken } from '@utils/jwtUtility';
+import { verifyToken } from 'middleware/jwtUtility';
 import jwt from 'jsonwebtoken';
 
 export const verifyJWT: RequestHandler<unknown, ApiResponse, unknown, unknown> = async (

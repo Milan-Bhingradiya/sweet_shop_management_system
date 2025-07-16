@@ -2,7 +2,7 @@ import type { RequestHandler } from 'express';
 import bcrypt from 'bcrypt';
 import prisma from '@utils/prisma_connected';
 import { createResponse, type ApiResponse } from '@utils/createResponse';
-import { generateToken } from '@utils/jwtUtility';
+import { generateToken } from 'middleware/jwtUtility';
 
 export interface LoginRequestBody {
   email?: string;
