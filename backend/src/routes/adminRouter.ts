@@ -1,6 +1,7 @@
 import { addCategory } from 'controller/v1/category/addCategory';
 import { Router } from 'express';
 import { authenticateToken, requireAdmin } from '@utils/jwtUtility';
+import { deleteCategory } from 'controller/v1/category/deleteCategory';
 
 const adminRouter = Router();
 
@@ -10,5 +11,6 @@ adminRouter.use(requireAdmin);
 
 // Category routes
 adminRouter.post('/categories', addCategory);
+adminRouter.delete('/categories/:id', deleteCategory);
 
 export default adminRouter;
