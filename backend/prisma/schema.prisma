@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int       @id @default(autoincrement())
+  name       String
+  email      String    @unique
+  password   String    // Hashed password
+  role       UserRole  @default(CUSTOMER)
+  created_at DateTime  @default(now())
+}
+
+enum UserRole {
+  ADMIN
+  CUSTOMER
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  products    Product[]
+}
+
+model Product {
+  id             Int        @id @default(autoincrement())
+  name           String
+  price          Int
+  description    String?
+  image_urls     String[]
+  stock_quantity Int
+  created_at     DateTime   @default(now())
+  categoryId     Int?
+  category       Category?  @relation(fields: [categoryId], references: [id])
+  order_items    OrderItem[]
+}
+
+model Order {
+  id             Int         @id @default(autoincrement())
+  customer_name  String
+  phone_number   String
+  token_number   Int
+  order_type     OrderType
+  status         OrderStatus @default(PENDING)
+  created_at     DateTime    @default(now())
+
+  // Delivery Address (only for DELIVERY orders)
+  address_line1  String?
+  address_line2  String?
+  city           String?
+  pincode        String?
+  landmark       String?
+
+  order_items    OrderItem[]
+}
+
+model OrderItem {
+  id         Int      @id @default(autoincrement())
+  order_id   Int
+  product_id Int
+  quantity   Int
+  price      Int
+
+  order      Order    @relation(fields: [order_id], references: [id])
+  product    Product  @relation(fields: [product_id], references: [id])
+}
+
+enum OrderStatus {
+  PENDING
+  READY
+  COMPLETED
+}
+
+enum OrderType {
+  DINE_IN
+  DELIVERY
+}
