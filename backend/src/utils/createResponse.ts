@@ -1,14 +1,13 @@
-// /src/utils/response.ts
-export interface _createResponse {
+export interface ApiResponse<T = any> {
   success: boolean;
   message: string;
-  data: Object | Object[] | null;
+  data: T;
 }
 
-export const createResponse = (success: boolean, message: string, data: any): _createResponse => {
+export const createResponse = <T>(success: boolean, message: string, data: T): ApiResponse<T> => {
   return {
     success,
     message,
-    data: data,
+    data,
   };
 };
