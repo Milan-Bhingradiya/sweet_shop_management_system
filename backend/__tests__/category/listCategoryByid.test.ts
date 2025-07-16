@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
-import app from '../../../src/app';
+import app from 'app';
 import request from 'supertest';
-import prisma from '../../../src/utils/prisma_connected';
+import prisma from '@utils/prisma_connected';
 
 describe('User API - Get Category by ID', () => {
   let testCategoryId: number;
