@@ -1,0 +1,33 @@
+{
+  "name": "backend",
+  "module": "src/app.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^24.0.14",
+    "dotenv": "^17.2.0",
+    "prettier": "^3.6.2"
+  },
+  "scripts": {
+    "start": "bun run src/server.ts",
+    "dev": "bun --watch src/server.ts",
+    "build": "bun build src/server.ts --outdir=dist",
+    "format": "prettier --write \"src/**/*.{ts,js,json,css,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,js,json,css,md}\""
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.12.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "backend": ".",
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
+  }
+}
