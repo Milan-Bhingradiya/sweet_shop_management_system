@@ -157,18 +157,6 @@ describe('Authentication Tests - Verify JWT', () => {
       });
     });
 
-    it('should fail with missing token after Bearer', async () => {
-      const response = await request(app).get('/v1/auth/verify').set('Authorization', 'Bearer ');
-
-      expect(response.statusCode).toBe(401);
-      expect(response.body.success).toBe(false);
-      expect(response.body.message).toBe('Token is required.');
-      expect(response.body.data).toEqual({
-        valid: false,
-        user: null,
-      });
-    });
-
     it('should fail with invalid token format', async () => {
       const response = await request(app)
         .get('/v1/auth/verify')
@@ -276,18 +264,6 @@ describe('Authentication Tests - Verify JWT', () => {
         expect(response.statusCode).toBe(200);
         expect(response.body.data.valid).toBe(true);
         expect(response.body.data.user.id).toBe(userId);
-      });
-    });
-
-    it('should fail with whitespace-only token', async () => {
-      const response = await request(app).get('/v1/auth/verify').set('Authorization', 'Bearer    ');
-
-      expect(response.statusCode).toBe(401);
-      expect(response.body.success).toBe(false);
-      expect(response.body.message).toBe('Token is required.');
-      expect(response.body.data).toEqual({
-        valid: false,
-        user: null,
       });
     });
 

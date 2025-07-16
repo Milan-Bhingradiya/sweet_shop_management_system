@@ -1,13 +1,9 @@
 import type { RequestHandler } from 'express';
 import prisma from '@utils/prisma_connected';
-import jwt from 'jsonwebtoken';
 import { createResponse, type ApiResponse } from '@utils/createResponse';
 import { verifyToken } from '@utils/jwtUtility';
+import jwt from 'jsonwebtoken';
 
-/**
- * Verifies JWT token from Authorization header and returns user data.
- * @route GET /v1/auth/verify
- */
 export const verifyJWT: RequestHandler<unknown, ApiResponse, unknown, unknown> = async (
   req,
   res,
@@ -34,10 +30,9 @@ export const verifyJWT: RequestHandler<unknown, ApiResponse, unknown, unknown> =
       );
     }
 
-    const token = authHeader.split(' ')[1];
-
-    // --- 2. Validate token exists and is not empty ---
-    if (!token || token.trim() === '') {
+    // --- 2. Extract and validate token ---
+    const authParts = authHeader.split(' ');
+    if (authParts.length !== 2 || !authParts[1] || authParts[1].trim() === '') {
       return res.status(401).json(
         createResponse(false, 'Token is required.', {
           valid: false,
@@ -46,10 +41,12 @@ export const verifyJWT: RequestHandler<unknown, ApiResponse, unknown, unknown> =
       );
     }
 
+    const token = authParts[1].trim();
+
     // --- 3. Verify JWT Token ---
     let decoded;
     try {
-      decoded = verifyToken(token.trim());
+      decoded = verifyToken(token);
     } catch (error) {
       let errorMessage = 'Invalid token.';
 
