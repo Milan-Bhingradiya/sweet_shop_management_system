@@ -30,8 +30,6 @@ describe('Admin Category Management - Delete Category', () => {
     // Clean up existing test data
     await prisma.orderItem.deleteMany();
     await prisma.order.deleteMany();
-    await prisma.cartItem.deleteMany();
-    await prisma.cart.deleteMany();
     await prisma.product.deleteMany();
     await prisma.category.deleteMany({
       where: {
@@ -120,8 +118,6 @@ describe('Admin Category Management - Delete Category', () => {
     // Clean up after tests
     await prisma.orderItem.deleteMany();
     await prisma.order.deleteMany();
-    await prisma.cartItem.deleteMany();
-    await prisma.cart.deleteMany();
     await prisma.product.deleteMany();
     await prisma.category.deleteMany({
       where: {

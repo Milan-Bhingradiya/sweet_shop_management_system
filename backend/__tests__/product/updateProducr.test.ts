@@ -26,8 +26,6 @@ describe('Admin Product Management - Update Product', () => {
 
   beforeEach(async () => {
     // Clean up existing test data
-    await prisma.cartItem.deleteMany();
-    await prisma.cart.deleteMany();
     await prisma.orderItem.deleteMany();
     await prisma.order.deleteMany();
     await prisma.product.deleteMany();
@@ -98,8 +96,6 @@ describe('Admin Product Management - Update Product', () => {
 
   afterEach(async () => {
     // Clean up after tests
-    await prisma.cartItem.deleteMany();
-    await prisma.cart.deleteMany();
     await prisma.orderItem.deleteMany();
     await prisma.order.deleteMany();
     await prisma.product.deleteMany();

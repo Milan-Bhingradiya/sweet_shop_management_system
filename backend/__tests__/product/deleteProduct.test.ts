@@ -26,8 +26,6 @@ describe('Admin Product Management - Delete Product', () => {
 
   beforeEach(async () => {
     // Clean up existing test data
-    await prisma.cartItem.deleteMany();
-    await prisma.cart.deleteMany();
     await prisma.orderItem.deleteMany();
     await prisma.order.deleteMany();
     await prisma.product.deleteMany();
@@ -35,7 +33,7 @@ describe('Admin Product Management - Delete Product', () => {
     await prisma.user.deleteMany({
       where: {
         email: {
-          in: [adminUser.email, customerUser.email, 'cart@example.com', 'order@example.com'],
+          in: [adminUser.email, customerUser.email, 'order@example.com'],
         },
       },
     });
@@ -98,8 +96,6 @@ describe('Admin Product Management - Delete Product', () => {
 
   afterEach(async () => {
     // Clean up after tests
-    await prisma.cartItem.deleteMany();
-    await prisma.cart.deleteMany();
     await prisma.orderItem.deleteMany();
     await prisma.order.deleteMany();
     await prisma.product.deleteMany();
@@ -107,7 +103,7 @@ describe('Admin Product Management - Delete Product', () => {
     await prisma.user.deleteMany({
       where: {
         email: {
-          in: [adminUser.email, customerUser.email, 'cart@example.com', 'order@example.com'],
+          in: [adminUser.email, customerUser.email, 'order@example.com'],
         },
       },
     });
@@ -169,49 +165,6 @@ describe('Admin Product Management - Delete Product', () => {
       expect(response.statusCode).toBe(404);
       expect(response.body.success).toBe(false);
       expect(response.body.message).toBe('Product not found.');
-    });
-
-    it('should delete product and remove from carts', async () => {
-      // Create a user and cart with the product
-      const user = await prisma.user.create({
-        data: {
-          name: 'Cart User',
-          email: 'cart@example.com',
-          password: 'password123',
-          role: 'CUSTOMER',
-        },
-      });
-
-      const cart = await prisma.cart.create({
-        data: { userId: user.id },
-      });
-
-      await prisma.cartItem.create({
-        data: {
-          cartId: cart.id,
-          productId: testProductId,
-          quantity: 2,
-        },
-      });
-
-      // Verify cart item exists
-      const cartItemsBefore = await prisma.cartItem.count({
-        where: { productId: testProductId },
-      });
-      expect(cartItemsBefore).toBe(1);
-
-      // Delete product
-      const response = await request(app)
-        .delete(`/v1/admin/products/${testProductId}`)
-        .set('Authorization', `Bearer ${adminToken}`);
-
-      expect(response.statusCode).toBe(200);
-
-      // Verify cart items were also deleted
-      const cartItemsAfter = await prisma.cartItem.count({
-        where: { productId: testProductId },
-      });
-      expect(cartItemsAfter).toBe(0);
     });
 
     it('should fail to delete product referenced in orders', async () => {

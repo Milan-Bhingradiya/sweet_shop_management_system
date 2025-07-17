@@ -10,8 +10,6 @@ describe('User Product Management - Get Product Details', () => {
 
   beforeEach(async () => {
     // Clean up existing test data
-    await prisma.cartItem.deleteMany();
-    await prisma.cart.deleteMany();
     await prisma.orderItem.deleteMany();
     await prisma.order.deleteMany();
     await prisma.product.deleteMany();
@@ -50,8 +48,6 @@ describe('User Product Management - Get Product Details', () => {
   });
 
   afterEach(async () => {
-    await prisma.cartItem.deleteMany();
-    await prisma.cart.deleteMany();
     await prisma.orderItem.deleteMany();
     await prisma.order.deleteMany();
     await prisma.product.deleteMany();

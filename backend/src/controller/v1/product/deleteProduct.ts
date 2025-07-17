@@ -30,7 +30,6 @@ export const deleteProduct: RequestHandler<
       where: { id: productId },
       include: {
         order_items: true,
-        CartItem: true,
       },
     });
 
@@ -49,13 +48,6 @@ export const deleteProduct: RequestHandler<
             null,
           ),
         );
-    }
-
-    // Delete related cart items first (cascade delete)
-    if (existingProduct.CartItem.length > 0) {
-      await prisma.cartItem.deleteMany({
-        where: { productId: productId },
-      });
     }
 
     // Delete the product
