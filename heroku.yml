@@ -1,0 +1,7 @@
+build:
+  docker:
+    web: backend/Dockerfile
+  config:
+    WORKDIR: backend
+run:
+  web: bun run start
