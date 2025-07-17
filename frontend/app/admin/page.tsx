@@ -40,7 +40,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { UploadButton } from "@/lib/uploadthing";
+import { CloudinaryUpload } from "@/components/cloudinary-upload";
 import { Trash2, Edit } from "lucide-react";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -416,18 +416,21 @@ export default function AdminPage() {
                   </div>
                   <div>
                     <Label>Product Images</Label>
-                    <UploadButton
-                      endpoint="imageUploader"
-                      onClientUploadComplete={(res) => {
-                        const urls = res.map((file) => file.url);
+                    <CloudinaryUpload
+                      onUploadComplete={(urls) => {
                         setNewProduct({
                           ...newProduct,
                           image_urls: [...newProduct.image_urls, ...urls],
                         });
                       }}
-                      onUploadError={(error: Error) => {
-                        alert(`ERROR! ${error.message}`);
+                      onUploadError={(error) => {
+                        toast({
+                          title: "Upload Error",
+                          description: error,
+                          variant: "destructive",
+                        });
                       }}
+                      maxFiles={5}
                     />
                     {newProduct.image_urls.length > 0 && (
                       <div className="mt-2">
@@ -604,12 +607,8 @@ export default function AdminPage() {
                                   </div>
                                   <div>
                                     <Label>Product Images</Label>
-                                    <UploadButton
-                                      endpoint="imageUploader"
-                                      onClientUploadComplete={(res) => {
-                                        const urls = res.map(
-                                          (file) => file.url
-                                        );
+                                    <CloudinaryUpload
+                                      onUploadComplete={(urls) => {
                                         setEditingProduct({
                                           ...editingProduct,
                                           image_urls: [
@@ -619,13 +618,14 @@ export default function AdminPage() {
                                           ],
                                         });
                                       }}
-                                      onUploadError={(error: Error) => {
+                                      onUploadError={(error) => {
                                         toast({
                                           title: "Upload Error",
-                                          description: error.message,
+                                          description: error,
                                           variant: "destructive",
                                         });
                                       }}
+                                      maxFiles={5}
                                     />
                                     {editingProduct.image_urls &&
                                       editingProduct.image_urls.length > 0 && (
