@@ -5,19 +5,19 @@ FROM oven/bun:1.1.38
 WORKDIR /app
 
 # Copy package.json and bun.lockb (if exists)
-COPY backend/package.json backend/bun.lock* ./
+COPY package.json bun.lock* ./
 
 # Install dependencies
 RUN bun install --frozen-lockfile
 
 # Copy prisma schema
-COPY backend/prisma ./prisma/
+COPY prisma ./prisma/
 
 # Generate Prisma client
 RUN bun prisma generate
 
 # Copy the rest of the application code
-COPY backend/ ./
+COPY . .
 
 # Build the application
 RUN bun run build

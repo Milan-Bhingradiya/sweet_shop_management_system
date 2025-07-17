@@ -1,7 +1,5 @@
 build:
   docker:
-    web: 
-      dockerfile: backend/Dockerfile
-      context: .
+    web: backend/Dockerfile
 run:
   web: bun run start
