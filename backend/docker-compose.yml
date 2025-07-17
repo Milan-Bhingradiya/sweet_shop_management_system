@@ -4,7 +4,7 @@ services:
   backend:
     build: .
     ports:
-      - "5000:5000"
+      - '5000:5000'
     environment:
       - DATABASE_URL=postgresql://username:password@db:5432/sweetshop
       - PORT=5000
@@ -21,7 +21,7 @@ services:
       POSTGRES_USER: username
       POSTGRES_PASSWORD: password
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
 

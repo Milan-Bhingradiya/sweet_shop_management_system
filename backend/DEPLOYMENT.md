@@ -1,6 +1,7 @@
 # Deploy Backend to Heroku with Docker
 
 ## Prerequisites
+
 1. Install [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
 2. Install [Docker](https://www.docker.com/get-started)
 3. Have a Heroku account
@@ -8,32 +9,38 @@
 ## Step-by-Step Deployment
 
 ### 1. Login to Heroku
+
 ```bash
 heroku login
 ```
 
 ### 2. Create a new Heroku app
+
 ```bash
 cd backend
 heroku create your-sweet-shop-backend
 ```
 
 ### 3. Set stack to container (for Docker)
+
 ```bash
 heroku stack:set container -a your-sweet-shop-backend
 ```
 
 ### 4. Add PostgreSQL database
+
 ```bash
 heroku addons:create heroku-postgresql:essential-0 -a your-sweet-shop-backend
 ```
 
 ### 5. Set environment variables
+
 ```bash
 heroku config:set NODE_ENV=production -a your-sweet-shop-backend
 ```
 
 ### 6. Deploy to Heroku
+
 ```bash
 git add .
 git commit -m "Add Docker configuration for Heroku deployment"
@@ -41,11 +48,13 @@ git push heroku main
 ```
 
 ### 7. Run database migrations
+
 ```bash
 heroku run bun prisma migrate deploy -a your-sweet-shop-backend
 ```
 
 ### 8. Open your app
+
 ```bash
 heroku open -a your-sweet-shop-backend
 ```
@@ -97,10 +106,12 @@ heroku apps:info -a your-sweet-shop-backend
 ## Environment Variables
 
 Your app will automatically get these from Heroku:
+
 - `DATABASE_URL` - PostgreSQL connection string
 - `PORT` - Port to listen on
 
 Add any additional environment variables using:
+
 ```bash
 heroku config:set VARIABLE_NAME=value -a your-sweet-shop-backend
 ```
