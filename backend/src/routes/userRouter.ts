@@ -4,8 +4,8 @@ import { getCategoryById } from 'controller/v1/category/getCategoryById';
 import { listProducts } from 'controller/v1/product/listProducts';
 import { getProductDetails } from 'controller/v1/product/getProductDetails';
 import { createOrder } from 'controller/v1/order/createOrder';
-import { listOrders } from 'controller/v1/order/listOrders';
-import { getOrderById } from 'controller/v1/order/getOrderById';
+import { listUserOrders } from 'controller/v1/order/listUserOrders';
+import { getUserOrderById } from 'controller/v1/order/getUserOrderById';
 import { authenticateToken } from 'middleware/jwtUtility';
 
 const userRouter = Router();
@@ -20,7 +20,7 @@ userRouter.get('/products/:id', getProductDetails);
 
 // === ORDER ROUTES (authentication required) ===
 userRouter.post('/orders', authenticateToken, createOrder);
-userRouter.get('/orders', authenticateToken, listOrders);
-userRouter.get('/orders/:id', authenticateToken, getOrderById);
+userRouter.get('/orders', authenticateToken, listUserOrders);
+userRouter.get('/orders/:id', authenticateToken, getUserOrderById);
 
 export default userRouter;

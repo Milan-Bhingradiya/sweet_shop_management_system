@@ -21,12 +21,10 @@ interface ListOrdersQuery {
  * Lists orders for the authenticated user with pagination and filtering.
  * @route GET /v1/user/orders
  */
-export const listOrders: RequestHandler<
-  unknown,
-  ApiResponse,
-  unknown,
-  ListOrdersQuery
-> = async (req: AuthenticatedRequest, res) => {
+export const listOrders: RequestHandler<unknown, ApiResponse, unknown, ListOrdersQuery> = async (
+  req: AuthenticatedRequest,
+  res,
+) => {
   try {
     const { page = '1', limit = '10', status, order_type } = req.query;
 
@@ -95,7 +93,7 @@ export const listOrders: RequestHandler<
 
     // --- 6. Prepare response data ---
     const responseData = {
-      orders: orders.map(order => ({
+      orders: orders.map((order) => ({
         id: order.id,
         customer_name: order.customer_name,
         phone_number: order.phone_number,
@@ -109,7 +107,7 @@ export const listOrders: RequestHandler<
         city: order.city,
         pincode: order.pincode,
         landmark: order.landmark,
-        order_items: order.order_items.map(item => ({
+        order_items: order.order_items.map((item) => ({
           id: item.id,
           product_id: item.product_id,
           quantity: item.quantity,
@@ -134,7 +132,6 @@ export const listOrders: RequestHandler<
     return res
       .status(200)
       .json(createResponse(true, 'Orders retrieved successfully.', responseData));
-
   } catch (error) {
     console.error('💥 List Orders Error:', error);
     return res.status(500).json(createResponse(false, 'An unexpected error occurred.', null));

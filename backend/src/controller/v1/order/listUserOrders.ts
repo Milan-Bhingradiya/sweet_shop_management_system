@@ -2,28 +2,39 @@ import type { RequestHandler, Request } from 'express';
 import prisma from '@utils/prisma_connected';
 import { createResponse, type ApiResponse } from '@utils/createResponse';
 
-interface AdminListOrdersQuery {
+interface ListOrdersQuery {
   page?: string;
   limit?: string;
-  status?: string;
-  order_type?: string;
-  search?: string;
+  status?: 'PENDING' | 'READY' | 'COMPLETED';
+}
+
+interface AuthenticatedRequest extends Request<unknown, ApiResponse, unknown, ListOrdersQuery> {
+  user?: {
+    id: number;
+    email: string;
+    role: string;
+  };
 }
 
 /**
- * Lists all orders for admin with pagination and filtering.
- * @route GET /v1/admin/orders
+ * Lists orders for authenticated user with pagination and filtering.
+ * @route GET /v1/user/orders
  */
-export const adminListOrders: RequestHandler<
+export const listUserOrders: RequestHandler<
   unknown,
   ApiResponse,
   unknown,
-  AdminListOrdersQuery
-> = async (req, res) => {
+  ListOrdersQuery
+> = async (req: AuthenticatedRequest, res) => {
   try {
-    const { page = '1', limit = '20', status, order_type, search } = req.query;
+    // --- 1. Validate Authentication ---
+    if (!req.user?.id) {
+      return res.status(401).json(createResponse(false, 'Authentication required.', null));
+    }
 
-    // --- 1. Parse and validate pagination ---
+    const { page = '1', limit = '10', status } = req.query;
+
+    // --- 2. Parse and Validate Pagination ---
     const pageNumber = parseInt(page, 10);
     const limitNumber = parseInt(limit, 10);
 
@@ -31,48 +42,28 @@ export const adminListOrders: RequestHandler<
       return res.status(400).json(createResponse(false, 'Page must be a positive integer.', null));
     }
 
-    if (isNaN(limitNumber) || limitNumber < 1 || limitNumber > 100) {
-      return res.status(400).json(createResponse(false, 'Limit must be between 1 and 100.', null));
+    if (isNaN(limitNumber) || limitNumber < 1 || limitNumber > 50) {
+      return res.status(400).json(createResponse(false, 'Limit must be between 1 and 50.', null));
     }
 
     const skip = (pageNumber - 1) * limitNumber;
 
-    // --- 2. Build filter conditions ---
-    const where: any = {};
+    // --- 3. Build Filter Conditions ---
+    const where: any = {
+      userId: req.user.id,
+    };
 
     if (status && ['PENDING', 'READY', 'COMPLETED'].includes(status)) {
       where.status = status;
     }
 
-    if (order_type && ['DINE_IN', 'DELIVERY'].includes(order_type)) {
-      where.order_type = order_type;
-    }
-
-    if (search) {
-      where.OR = [
-        { customer_name: { contains: search, mode: 'insensitive' } },
-        { phone_number: { contains: search } },
-        { token_number: parseInt(search, 10) || undefined },
-      ].filter(
-        (condition) =>
-          condition.token_number !== undefined || condition.customer_name || condition.phone_number,
-      );
-    }
-
-    // --- 3. Fetch orders with pagination ---
+    // --- 4. Fetch Orders with Pagination ---
     const [orders, totalOrders] = await Promise.all([
       prisma.order.findMany({
         where,
         skip,
         take: limitNumber,
         include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
           order_items: {
             include: {
               product: {
@@ -92,16 +83,15 @@ export const adminListOrders: RequestHandler<
       prisma.order.count({ where }),
     ]);
 
-    // --- 4. Calculate pagination info ---
+    // --- 5. Calculate Pagination Info ---
     const totalPages = Math.ceil(totalOrders / limitNumber);
     const hasNextPage = pageNumber < totalPages;
     const hasPrevPage = pageNumber > 1;
 
-    // --- 5. Prepare response data ---
+    // --- 6. Prepare Response Data ---
     const responseData = {
       orders: orders.map((order) => ({
         id: order.id,
-        userId: order.userId,
         customer_name: order.customer_name,
         phone_number: order.phone_number,
         token_number: order.token_number,
@@ -114,11 +104,6 @@ export const adminListOrders: RequestHandler<
         city: order.city,
         pincode: order.pincode,
         landmark: order.landmark,
-        user: {
-          id: order.user.id,
-          name: order.user.name,
-          email: order.user.email,
-        },
         order_items: order.order_items.map((item) => ({
           id: item.id,
           product_id: item.product_id,
@@ -131,6 +116,7 @@ export const adminListOrders: RequestHandler<
           },
         })),
       })),
+      total: totalOrders,
       pagination: {
         currentPage: pageNumber,
         totalPages,
@@ -141,11 +127,12 @@ export const adminListOrders: RequestHandler<
       },
     };
 
+    // --- 7. Send Success Response ---
     return res
       .status(200)
       .json(createResponse(true, 'Orders retrieved successfully.', responseData));
   } catch (error) {
-    console.error('💥 Admin List Orders Error:', error);
+    console.error('💥 List User Orders Error:', error);
     return res.status(500).json(createResponse(false, 'An unexpected error occurred.', null));
   }
 };

@@ -183,11 +183,11 @@ describe('Order Management - Additional Endpoints', () => {
       const response = await request(app)
         .put(`/v1/admin/orders/${testOrderId}/status`)
         .set('Authorization', `Bearer ${adminToken}`)
-        .send({ status: 'READY' });
+        .send({ status: 'COMPLETED' });
 
       expect(response.statusCode).toBe(200);
       expect(response.body.success).toBe(true);
-      expect(response.body.data.status).toBe('READY');
+      expect(response.body.data.status).toBe('COMPLETED');
     });
 
     it('should fail with invalid status', async () => {

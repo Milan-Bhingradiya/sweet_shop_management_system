@@ -126,7 +126,7 @@ describe('User Order Management - List and Get Orders', () => {
         phone_number: '9876543210',
         token_number: 2,
         order_type: 'DELIVERY',
-        status: 'READY',
+        status: 'COMPLETED',
         total_amount: 1999,
         address_line1: '123 Main St',
         city: 'Mumbai',
@@ -171,7 +171,7 @@ describe('User Order Management - List and Get Orders', () => {
       expect(response.body.message).toBe('Orders retrieved successfully.');
       expect(response.body.data.orders).toHaveLength(2);
       expect(response.body.data.total).toBe(2);
-      
+
       // Check order structure
       const order = response.body.data.orders[0];
       expect(order).toHaveProperty('id');
@@ -198,12 +198,12 @@ describe('User Order Management - List and Get Orders', () => {
 
     it('should filter by order status', async () => {
       const response = await request(app)
-        .get('/v1/user/orders?status=READY')
+        .get('/v1/user/orders?status=COMPLETED')
         .set('Authorization', `Bearer ${customerToken}`);
 
       expect(response.statusCode).toBe(200);
       expect(response.body.data.orders).toHaveLength(1);
-      expect(response.body.data.orders[0].status).toBe('READY');
+      expect(response.body.data.orders[0].status).toBe('COMPLETED');
     }, 10000);
 
     it('should fail without authentication', async () => {
@@ -296,6 +296,6 @@ describe('User Order Management - List and Get Orders', () => {
 
       expect(response.statusCode).toBe(401);
       expect(response.body.success).toBe(false);
-    });
+    }, 10000);
   });
 });

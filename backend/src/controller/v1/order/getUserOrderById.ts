@@ -1,42 +1,27 @@
-import type { RequestHandler, Request } from 'express';
+import type { RequestHandler } from 'express';
 import prisma from '@utils/prisma_connected';
 import { createResponse, type ApiResponse } from '@utils/createResponse';
 
-interface AuthenticatedRequest extends Request<GetOrderParams, ApiResponse, unknown, unknown> {
-  user?: {
-    id: number;
-    email: string;
-    role: string;
-  };
-}
-
-interface GetOrderParams {
-  id: string;
-}
-
 /**
- * Gets order details by ID for the authenticated user.
+ * Gets order details by ID for authenticated user.
  * @route GET /v1/user/orders/:id
  */
-export const getOrderById: RequestHandler<GetOrderParams, ApiResponse, unknown, unknown> = async (
-  req: AuthenticatedRequest,
-  res,
-) => {
+export const getUserOrderById: RequestHandler = async (req: any, res) => {
   try {
-    const { id } = req.params;
-
     // --- 1. Validate Authentication ---
     if (!req.user?.id) {
       return res.status(401).json(createResponse(false, 'Authentication required.', null));
     }
 
-    // --- 2. Validate order ID ---
+    const { id } = req.params;
+
+    // --- 2. Validate Order ID ---
     const orderId = parseInt(id, 10);
     if (isNaN(orderId) || orderId <= 0) {
-      return res.status(400).json(createResponse(false, 'Invalid order ID.', null));
+      return res.status(400).json(createResponse(false, 'Invalid order ID format.', null));
     }
 
-    // --- 3. Fetch order ---
+    // --- 3. Fetch Order ---
     const order = await prisma.order.findFirst({
       where: {
         id: orderId,
@@ -50,8 +35,6 @@ export const getOrderById: RequestHandler<GetOrderParams, ApiResponse, unknown, 
                 id: true,
                 name: true,
                 image_urls: true,
-                price: true,
-                description: true,
               },
             },
           },
@@ -59,11 +42,12 @@ export const getOrderById: RequestHandler<GetOrderParams, ApiResponse, unknown, 
       },
     });
 
+    // --- 4. Check if Order Exists ---
     if (!order) {
       return res.status(404).json(createResponse(false, 'Order not found.', null));
     }
 
-    // --- 4. Prepare response data ---
+    // --- 5. Prepare Response Data ---
     const responseData = {
       id: order.id,
       userId: order.userId,
@@ -88,17 +72,16 @@ export const getOrderById: RequestHandler<GetOrderParams, ApiResponse, unknown, 
           id: item.product.id,
           name: item.product.name,
           image_urls: item.product.image_urls,
-          price: item.product.price,
-          description: item.product.description,
         },
       })),
     };
 
+    // --- 6. Send Success Response ---
     return res
       .status(200)
-      .json(createResponse(true, 'Order retrieved successfully.', responseData));
+      .json(createResponse(true, 'Order details retrieved successfully.', responseData));
   } catch (error) {
-    console.error('💥 Get Order Error:', error);
+    console.error('💥 Get User Order By ID Error:', error);
     return res.status(500).json(createResponse(false, 'An unexpected error occurred.', null));
   }
 };

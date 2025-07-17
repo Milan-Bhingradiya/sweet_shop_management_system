@@ -2,7 +2,8 @@ import type { RequestHandler, Request } from 'express';
 import prisma from '@utils/prisma_connected';
 import { createResponse, type ApiResponse } from '@utils/createResponse';
 
-interface AuthenticatedRequest extends Request<UpdateOrderStatusParams, ApiResponse, UpdateOrderStatusBody, unknown> {
+interface AuthenticatedRequest
+  extends Request<UpdateOrderStatusParams, ApiResponse, UpdateOrderStatusBody, unknown> {
   user?: {
     id: number;
     email: string;
@@ -15,7 +16,7 @@ interface UpdateOrderStatusParams {
 }
 
 interface UpdateOrderStatusBody {
-  status: 'PENDING' | 'READY' | 'COMPLETED';
+  status: 'PENDING' | 'COMPLETED';
 }
 
 /**
@@ -39,8 +40,10 @@ export const updateOrderStatus: RequestHandler<
     }
 
     // --- 2. Validate status ---
-    if (!status || !['PENDING', 'READY', 'COMPLETED'].includes(status)) {
-      return res.status(400).json(createResponse(false, 'Valid status is required (PENDING, READY, COMPLETED).', null));
+    if (!status || !['PENDING', 'COMPLETED'].includes(status)) {
+      return res
+        .status(400)
+        .json(createResponse(false, 'Valid status is required (PENDING, COMPLETED).', null));
     }
 
     // --- 3. Check if order exists ---
@@ -99,7 +102,6 @@ export const updateOrderStatus: RequestHandler<
     return res
       .status(200)
       .json(createResponse(true, 'Order status updated successfully.', responseData));
-
   } catch (error) {
     console.error('💥 Update Order Status Error:', error);
 

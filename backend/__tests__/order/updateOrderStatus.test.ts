@@ -139,32 +139,31 @@ describe('Admin Order Management - Update Order Status', () => {
       const response = await request(app)
         .put(`/v1/admin/orders/${testOrderId}/status`)
         .set('Authorization', `Bearer ${adminToken}`)
-        .send({ status: 'READY' });
+        .send({ status: 'COMPLETED' });
 
       expect(response.statusCode).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body.message).toBe('Order status updated successfully.');
-      expect(response.body.data).toEqual({
-        id: testOrderId,
-        status: 'READY',
-        updated_at: expect.any(String),
-      });
+      expect(response.body.data.id).toBe(testOrderId);
+      expect(response.body.data.status).toBe('COMPLETED');
+      expect(response.body.data.customer_name).toBe('John Doe');
+      expect(response.body.data.order_type).toBe('DINE_IN');
 
       // Verify the status was actually updated in database
       const updatedOrder = await prisma.order.findUnique({
         where: { id: testOrderId },
       });
-      expect(updatedOrder?.status).toBe('READY');
+      expect(updatedOrder?.status).toBe('COMPLETED');
     });
 
     it('should update order status to COMPLETED', async () => {
       const response = await request(app)
         .put(`/v1/admin/orders/${testOrderId}/status`)
         .set('Authorization', `Bearer ${adminToken}`)
-        .send({ status: 'COMPLETED' });
+        .send({ status: 'PENDING' });
 
       expect(response.statusCode).toBe(200);
-      expect(response.body.data.status).toBe('COMPLETED');
+      expect(response.body.data.status).toBe('PENDING');
     });
 
     it('should fail with invalid status value', async () => {
@@ -175,14 +174,14 @@ describe('Admin Order Management - Update Order Status', () => {
 
       expect(response.statusCode).toBe(400);
       expect(response.body.success).toBe(false);
-      expect(response.body.message).toContain('Invalid status');
+      expect(response.body.message).toContain('Valid status is required');
     });
 
     it('should fail for non-existent order', async () => {
       const response = await request(app)
         .put('/v1/admin/orders/999999/status')
         .set('Authorization', `Bearer ${adminToken}`)
-        .send({ status: 'READY' });
+        .send({ status: 'COMPLETED' });
 
       expect(response.statusCode).toBe(404);
       expect(response.body.success).toBe(false);
@@ -192,7 +191,7 @@ describe('Admin Order Management - Update Order Status', () => {
     it('should fail without admin token', async () => {
       const response = await request(app)
         .put(`/v1/admin/orders/${testOrderId}/status`)
-        .send({ status: 'READY' });
+        .send({ status: 'COMPLETED' });
 
       expect(response.statusCode).toBe(401);
       expect(response.body.success).toBe(false);
@@ -202,7 +201,7 @@ describe('Admin Order Management - Update Order Status', () => {
       const response = await request(app)
         .put(`/v1/admin/orders/${testOrderId}/status`)
         .set('Authorization', `Bearer ${customerToken}`)
-        .send({ status: 'READY' });
+        .send({ status: 'COMPLETED' });
 
       expect(response.statusCode).toBe(403);
       expect(response.body.success).toBe(false);
@@ -216,14 +215,14 @@ describe('Admin Order Management - Update Order Status', () => {
 
       expect(response.statusCode).toBe(400);
       expect(response.body.success).toBe(false);
-      expect(response.body.message).toContain('Status is required');
+      expect(response.body.message).toContain('Valid status is required');
     });
 
     it('should fail with invalid order ID format', async () => {
       const response = await request(app)
         .put('/v1/admin/orders/invalid/status')
         .set('Authorization', `Bearer ${adminToken}`)
-        .send({ status: 'READY' });
+        .send({ status: 'COMPLETED' });
 
       expect(response.statusCode).toBe(400);
       expect(response.body.success).toBe(false);
@@ -241,7 +240,7 @@ describe('Admin Order Management - Update Order Status', () => {
       expect(response.body.success).toBe(true);
       expect(response.body.message).toBe('Orders retrieved successfully.');
       expect(response.body.data.orders).toHaveLength(1);
-      expect(response.body.data.total).toBe(1);
+      expect(response.body.data.pagination.totalOrders).toBe(1);
     });
 
     it('should support filtering by status', async () => {
