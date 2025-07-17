@@ -7,7 +7,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ['utfs.io'], // Add UploadThing domain for images
+    domains: ['res.cloudinary.com'], // Add Cloudinary domain for images
     unoptimized: true,
   },
 }
