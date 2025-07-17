@@ -16,7 +16,6 @@
     "build": "bun build src/server.ts --outdir=dist",
     "format": "prettier --write \"src/**/*.{ts,js,json,css,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,js,json,css,md}\"",
-    "postinstall": "prisma generate",
     "migrate": "prisma migrate deploy"
   },
   "engines": {

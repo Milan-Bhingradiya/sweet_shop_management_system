@@ -7,11 +7,11 @@ WORKDIR /app
 # Copy package.json and bun.lockb (if exists)
 COPY package.json bun.lock* ./
 
+# Copy prisma schema first (before installing dependencies)
+COPY prisma ./prisma/
+
 # Install dependencies
 RUN bun install --frozen-lockfile
-
-# Copy prisma schema
-COPY prisma ./prisma/
 
 # Generate Prisma client
 RUN bun prisma generate
