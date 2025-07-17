@@ -6,6 +6,8 @@ import { editCategory } from 'controller/v1/category/editCategory';
 import { addProduct } from 'controller/v1/product/addProduct';
 import { updateProduct } from 'controller/v1/product/updateProduct';
 import { deleteProduct } from 'controller/v1/product/deleteProduct';
+import { adminListOrders } from 'controller/v1/order/adminListOrders';
+import { updateOrderStatus } from 'controller/v1/order/updateOrderStatus';
 
 const adminRouter = Router();
 
@@ -21,6 +23,10 @@ adminRouter.put('/categories/:id', editCategory);
 // === PRODUCT ROUTES ===
 adminRouter.post('/products', addProduct);
 adminRouter.put('/products/:id', updateProduct);
-adminRouter.delete('/products/:id', deleteProduct); // ← MAKE SURE THIS EXISTS
+adminRouter.delete('/products/:id', deleteProduct);
+
+// === ORDER ROUTES ===
+adminRouter.get('/orders', adminListOrders);
+adminRouter.put('/orders/:id/status', updateOrderStatus);
 
 export default adminRouter;
