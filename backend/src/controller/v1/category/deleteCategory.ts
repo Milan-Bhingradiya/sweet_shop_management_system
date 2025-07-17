@@ -7,7 +7,8 @@ export interface DeleteCategoryParams {
 }
 
 /**
- * Deletes a category by ID (Admin only).
+ * Deletes a category by ID along with all products and related order items (Admin only).
+ * This performs a cascade deletion: order_items -> products -> category
  * @route DELETE /v1/admin/categories/:id
  */
 export const deleteCategory: RequestHandler<
@@ -43,30 +44,51 @@ export const deleteCategory: RequestHandler<
       return res.status(404).json(createResponse(false, 'Category not found.', null));
     }
 
-    // --- 4. Check if Category Has Products ---
+    // --- 4. Delete All Products in Category (with cascade deletion) ---
+    let deletedProductsCount = 0;
+    let deletedOrderItemsCount = 0;
+
     if (existingCategory.products && existingCategory.products.length > 0) {
-      return res
-        .status(409)
-        .json(
-          createResponse(
-            false,
-            'Cannot delete category that contains products. Please move or delete products first.',
-            null,
-          ),
-        );
+      deletedProductsCount = existingCategory.products.length;
+
+      // Use transaction to ensure data consistency
+      await prisma.$transaction(async (tx) => {
+        // First, delete all order items that reference products in this category
+        const deleteOrderItemsResult = await tx.orderItem.deleteMany({
+          where: {
+            product_id: {
+              in: existingCategory.products.map((product) => product.id),
+            },
+          },
+        });
+
+        deletedOrderItemsCount = deleteOrderItemsResult.count;
+
+        // Then delete all products in this category
+        await tx.product.deleteMany({
+          where: { categoryId: categoryId },
+        });
+
+        // Finally delete the category
+        await tx.category.delete({
+          where: { id: categoryId },
+        });
+      });
+    } else {
+      // If no products, just delete the category
+      await prisma.category.delete({
+        where: { id: categoryId },
+      });
     }
 
-    // --- 5. Delete Category ---
-    await prisma.category.delete({
-      where: { id: categoryId },
-    });
-
-    // --- 6. Send Success Response ---
+    // --- 5. Send Success Response ---
     return res.status(200).json(
       createResponse(true, 'Category deleted successfully.', {
         id: existingCategory.id,
         name: existingCategory.name,
         deleted: true,
+        deletedProductsCount: deletedProductsCount,
+        deletedOrderItemsCount: deletedOrderItemsCount,
       }),
     );
   } catch (error) {
@@ -75,19 +97,6 @@ export const deleteCategory: RequestHandler<
     // Handle Prisma specific errors
     if (error && typeof error === 'object' && 'code' in error) {
       const prismaError = error as { code: string; meta?: any };
-
-      // Handle foreign key constraint violation
-      if (prismaError.code === 'P2003') {
-        return res
-          .status(409)
-          .json(
-            createResponse(
-              false,
-              'Cannot delete category that contains products. Please move or delete products first.',
-              null,
-            ),
-          );
-      }
 
       // Handle record not found during deletion
       if (prismaError.code === 'P2025') {

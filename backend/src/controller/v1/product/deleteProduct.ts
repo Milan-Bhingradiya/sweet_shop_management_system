@@ -8,6 +8,7 @@ interface DeleteProductParams {
 
 /**
  * Deletes a product by ID (Admin only).
+ * Order items referencing this product will be automatically deleted due to cascade deletion.
  * @route DELETE /v1/admin/products/:id
  */
 export const deleteProduct: RequestHandler<
@@ -37,20 +38,10 @@ export const deleteProduct: RequestHandler<
       return res.status(404).json(createResponse(false, 'Product not found.', null));
     }
 
-    // Check if product is referenced in orders
-    if (existingProduct.order_items.length > 0) {
-      return res
-        .status(400)
-        .json(
-          createResponse(
-            false,
-            'Cannot delete product. It is referenced in existing orders.',
-            null,
-          ),
-        );
-    }
+    // Count order items that will be deleted for reporting
+    const orderItemsCount = existingProduct.order_items.length;
 
-    // Delete the product
+    // Delete the product (order items will be automatically deleted due to cascade)
     await prisma.product.delete({
       where: { id: productId },
     });
@@ -59,6 +50,7 @@ export const deleteProduct: RequestHandler<
       id: productId,
       name: existingProduct.name,
       deleted_at: new Date().toISOString(),
+      deletedOrderItemsCount: orderItemsCount,
     };
 
     return res
@@ -71,17 +63,9 @@ export const deleteProduct: RequestHandler<
     if (error && typeof error === 'object' && 'code' in error) {
       const prismaError = error as { code: string; meta?: any };
 
-      // Handle foreign key constraint violations
-      if (prismaError.code === 'P2003') {
-        return res
-          .status(400)
-          .json(
-            createResponse(
-              false,
-              'Cannot delete product. It is referenced by other records.',
-              null,
-            ),
-          );
+      // Handle record not found during deletion
+      if (prismaError.code === 'P2025') {
+        return res.status(404).json(createResponse(false, 'Product not found.', null));
       }
     }
 

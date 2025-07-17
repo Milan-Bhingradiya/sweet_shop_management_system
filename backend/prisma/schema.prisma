@@ -40,7 +40,7 @@ model Product {
   stock_quantity Int
   created_at     DateTime   @default(now())
   categoryId     Int?
-  category       Category?  @relation(fields: [categoryId], references: [id])
+  category       Category?  @relation(fields: [categoryId], references: [id] ,onDelete: Cascade)
   order_items    OrderItem[]
 }
 
@@ -72,8 +72,8 @@ model OrderItem {
   product_id Int
   quantity   Int
   price      Int
-  order      Order   @relation(fields: [order_id], references: [id])
-  product    Product @relation(fields: [product_id], references: [id])
+  order      Order   @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
 }
 
 enum OrderStatus {
