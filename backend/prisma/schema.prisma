@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
 }
 
 model User {
@@ -14,7 +14,8 @@ model User {
   password   String    // Hashed password
   role       UserRole  @default(CUSTOMER)
   created_at DateTime  @default(now())
-  Cart Cart[]
+  Cart       Cart[]
+  orders     Order[]   // ← ADD THIS: User can have multiple orders
 }
 
 enum UserRole {
@@ -42,15 +43,15 @@ model Product {
   categoryId     Int?
   category       Category?  @relation(fields: [categoryId], references: [id])
   order_items    OrderItem[]
-  CartItem CartItem[]
+  CartItem       CartItem[]
 }
 
 model Cart {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @unique
+  id        Int        @id @default(autoincrement())
+  userId    Int        @unique
   items     CartItem[]
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
+  updatedAt DateTime   @updatedAt
+  user      User       @relation(fields: [userId], references: [id])
 }
 
 model CartItem {
@@ -64,11 +65,13 @@ model CartItem {
 
 model Order {
   id             Int         @id @default(autoincrement())
+  userId         Int         // ← ADD THIS: Foreign key to User
   customer_name  String
   phone_number   String
   token_number   Int
   order_type     OrderType
   status         OrderStatus @default(PENDING)
+  total_amount   Int         // ← ADD THIS: Total order amount
   created_at     DateTime    @default(now())
   // Delivery Address (only for DELIVERY orders)
   address_line1  String?
@@ -77,17 +80,18 @@ model Order {
   pincode        String?
   landmark       String?
   order_items    OrderItem[]
-  Payment Payment[]
+  Payment        Payment[]
+  user           User        @relation(fields: [userId], references: [id]) // ← ADD THIS: Relation to User
 }
 
 model OrderItem {
-  id         Int      @id @default(autoincrement())
+  id         Int     @id @default(autoincrement())
   order_id   Int
   product_id Int
   quantity   Int
   price      Int
-  order      Order    @relation(fields: [order_id], references: [id])
-  product    Product  @relation(fields: [product_id], references: [id])
+  order      Order   @relation(fields: [order_id], references: [id])
+  product    Product @relation(fields: [product_id], references: [id])
 }
 
 enum OrderStatus {
@@ -102,14 +106,14 @@ enum OrderType {
 }
 
 model Payment {
-  id           Int       @id @default(autoincrement())
-  orderId      Int       @unique
-  amount       Int
-  method       PaymentMethod
-  status       PaymentStatus @default(PENDING)
-  payment_date DateTime? 
-  transaction_id String?   // From Razorpay, Stripe, etc.
-  order        Order      @relation(fields: [orderId], references: [id])
+  id             Int           @id @default(autoincrement())
+  orderId        Int           @unique
+  amount         Int
+  method         PaymentMethod
+  status         PaymentStatus @default(PENDING)
+  payment_date   DateTime?
+  transaction_id String?       // From Razorpay, Stripe, etc.
+  order          Order         @relation(fields: [orderId], references: [id])
 }
 
 enum PaymentMethod {
@@ -124,4 +128,3 @@ enum PaymentStatus {
   SUCCESS
   FAILED
 }
-
