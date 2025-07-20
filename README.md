@@ -2,6 +2,15 @@
 
 A modern full-stack web application for managing a sweet shop with inventory, orders, and customer management.
 
+## Live Demo
+
+🌐 **Frontend**: [Sweet Shop App](https://sweet-shop-management-system-seven.vercel.app/)
+🔧 **Backend API**: [API Endpoints](https://sweet-shop-management-system-60d31ee24ccf.herokuapp.com/)
+
+---
+
+_Built with ❤️ using Test-Driven Development_
+
 ## Tech Stack
 
 - **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
@@ -127,12 +136,3 @@ bun test
 # Start development
 bun run dev
 ```
-
-## Live Demo
-
-🌐 **Frontend**: [Sweet Shop App](https://sweet-shop-management-system-seven.vercel.app/)
-🔧 **Backend API**: [API Endpoints](https://sweet-shop-management-system-60d31ee24ccf.herokuapp.com/)
-
----
-
-_Built with ❤️ using Test-Driven Development_
