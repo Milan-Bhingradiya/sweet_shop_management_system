@@ -372,6 +372,9 @@ describe('Authentication Tests - Login', () => {
       // First login
       const response1 = await request(app).post('/v1/auth/login').send(loginData);
 
+      // Wait a small amount to ensure different timestamps
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       // Second login
       const response2 = await request(app).post('/v1/auth/login').send(loginData);
 

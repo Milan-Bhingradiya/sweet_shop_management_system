@@ -149,6 +149,8 @@ describe('Admin Category Management - Delete Category', () => {
         id: testCategoryId,
         name: 'Test Category',
         deleted: true,
+        deletedProductsCount: 0,
+        deletedOrderItemsCount: 0,
       });
 
       // Verify category is deleted from database
@@ -221,23 +223,33 @@ describe('Admin Category Management - Delete Category', () => {
       expect(response.body.data).toBe(null);
     });
 
-    it('should fail to delete category that has products', async () => {
+    it('should delete category that has products (cascade deletion)', async () => {
       const response = await request(app)
         .delete(`/v1/admin/categories/${testCategoryWithProductsId}`)
         .set('Authorization', `Bearer ${adminToken}`);
 
-      expect(response.statusCode).toBe(409);
-      expect(response.body.success).toBe(false);
-      expect(response.body.message).toBe(
-        'Cannot delete category that contains products. Please move or delete products first.',
-      );
-      expect(response.body.data).toBe(null);
+      expect(response.statusCode).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.message).toBe('Category deleted successfully.');
+      expect(response.body.data).toEqual({
+        id: testCategoryWithProductsId,
+        name: 'Category with Products',
+        deleted: true,
+        deletedProductsCount: 1, // One product was created in this category
+        deletedOrderItemsCount: expect.any(Number),
+      });
 
-      // Verify category still exists
-      const existingCategory = await prisma.category.findUnique({
+      // Verify category is deleted from database
+      const deletedCategory = await prisma.category.findUnique({
         where: { id: testCategoryWithProductsId },
       });
-      expect(existingCategory).toBeTruthy();
+      expect(deletedCategory).toBeNull();
+
+      // Verify products in the category are also deleted
+      const productsInCategory = await prisma.product.findMany({
+        where: { categoryId: testCategoryWithProductsId },
+      });
+      expect(productsInCategory).toHaveLength(0);
     });
 
     it('should fail with zero as category ID', async () => {
@@ -275,6 +287,8 @@ describe('Admin Category Management - Delete Category', () => {
           id: expect.any(Number),
           name: expect.any(String),
           deleted: expect.any(Boolean),
+          deletedProductsCount: expect.any(Number),
+          deletedOrderItemsCount: expect.any(Number),
         },
       });
 
@@ -282,6 +296,8 @@ describe('Admin Category Management - Delete Category', () => {
       expect(typeof response.body.data.id).toBe('number');
       expect(typeof response.body.data.name).toBe('string');
       expect(typeof response.body.data.deleted).toBe('boolean');
+      expect(typeof response.body.data.deletedProductsCount).toBe('number');
+      expect(typeof response.body.data.deletedOrderItemsCount).toBe('number');
       expect(response.body.data.deleted).toBe(true);
     });
 

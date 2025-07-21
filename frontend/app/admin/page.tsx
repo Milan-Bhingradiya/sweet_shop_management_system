@@ -926,8 +926,9 @@ export default function AdminPage() {
                     <div className="text-center py-4 text-red-500">
                       Failed to load orders
                     </div>
-                  ) : orders?.data && Array.isArray(orders.data) ? (
-                    orders.data.map((order: any) => (
+                  ) : orders?.data?.orders &&
+                    Array.isArray(orders.data.orders) ? (
+                    orders.data.orders.map((order: any) => (
                       <div key={order.id} className="p-4 border rounded-lg">
                         <div className="flex items-center justify-between mb-2">
                           <div>
@@ -964,7 +965,7 @@ export default function AdminPage() {
                             </Select>
                           </div>
                         </div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm text-gray-600 mb-2">
                           <p>Items: {order.order_items?.length || 0}</p>
                           {order.order_type === "DELIVERY" &&
                             order.address_line1 && (
@@ -974,6 +975,40 @@ export default function AdminPage() {
                               </p>
                             )}
                         </div>
+                        {/* Order Items */}
+                        {order.order_items && order.order_items.length > 0 && (
+                          <div className="bg-gray-100 rounded p-2 mb-2">
+                            <p className="font-semibold mb-1">Order Items:</p>
+                            <ul className="space-y-2">
+                              {order.order_items.map((item: any) => (
+                                <li
+                                  key={item.id}
+                                  className="flex items-center gap-3"
+                                >
+                                  {item.product?.image_urls?.[0] && (
+                                    <img
+                                      src={item.product.image_urls[0]}
+                                      alt={item.product.name}
+                                      className="w-12 h-12 object-cover rounded"
+                                    />
+                                  )}
+                                  <div>
+                                    <p className="font-medium">
+                                      {item.product?.name}
+                                    </p>
+                                    <p className="text-xs text-gray-500">
+                                      Qty: {item.quantity} × ₹{item.price}
+                                    </p>
+                                  </div>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        <p className="text-xs text-gray-400">
+                          Placed on:{" "}
+                          {new Date(order.created_at).toLocaleString()}
+                        </p>
                       </div>
                     ))
                   ) : (

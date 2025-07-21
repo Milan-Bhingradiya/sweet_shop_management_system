@@ -1,13 +1,13 @@
-import { addCategory } from 'controller/v1/category/addCategory';
+import { addCategory } from '../controller/v1/category/addCategory';
 import { Router } from 'express';
-import { authenticateToken, requireAdmin } from 'middleware/jwtUtility';
-import { deleteCategory } from 'controller/v1/category/deleteCategory';
-import { editCategory } from 'controller/v1/category/editCategory';
-import { addProduct } from 'controller/v1/product/addProduct';
-import { updateProduct } from 'controller/v1/product/updateProduct';
-import { deleteProduct } from 'controller/v1/product/deleteProduct';
-import { adminListOrders } from 'controller/v1/order/adminListOrders';
-import { updateOrderStatus } from 'controller/v1/order/updateOrderStatus';
+import { authenticateToken, requireAdmin } from '../middleware/jwtUtility';
+import { deleteCategory } from '../controller/v1/category/deleteCategory';
+import { editCategory } from '../controller/v1/category/editCategory';
+import { addProduct } from '../controller/v1/product/addProduct';
+import { updateProduct } from '../controller/v1/product/updateProduct';
+import { deleteProduct } from '../controller/v1/product/deleteProduct';
+import { adminListOrders } from '../controller/v1/order/adminListOrders';
+import { updateOrderStatus } from '../controller/v1/order/updateOrderStatus';
 
 const adminRouter = Router();
 

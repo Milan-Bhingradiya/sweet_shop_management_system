@@ -122,6 +122,7 @@ describe('Admin Product Management - Delete Product', () => {
         id: testProductId,
         name: 'Product to Delete',
         deleted_at: expect.any(String),
+        deletedOrderItemsCount: 0,
       });
 
       // Verify product was deleted from database
@@ -167,7 +168,7 @@ describe('Admin Product Management - Delete Product', () => {
       expect(response.body.message).toBe('Product not found.');
     });
 
-    it('should fail to delete product referenced in orders', async () => {
+    it('should delete product referenced in orders (cascade deletion)', async () => {
       // Create a user and order with the product
       const user = await prisma.user.create({
         data: {
@@ -199,22 +200,32 @@ describe('Admin Product Management - Delete Product', () => {
         },
       });
 
-      // Try to delete product
+      // Delete product (should succeed with cascade deletion)
       const response = await request(app)
         .delete(`/v1/admin/products/${testProductId}`)
         .set('Authorization', `Bearer ${adminToken}`);
 
-      expect(response.statusCode).toBe(400);
-      expect(response.body.success).toBe(false);
-      expect(response.body.message).toContain(
-        'Cannot delete product. It is referenced in existing orders',
-      );
+      expect(response.statusCode).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.message).toBe('Product deleted successfully.');
+      expect(response.body.data).toEqual({
+        id: testProductId,
+        name: 'Product to Delete',
+        deleted_at: expect.any(String),
+        deletedOrderItemsCount: 1, // One order item was deleted
+      });
 
-      // Verify product still exists
-      const product = await prisma.product.findUnique({
+      // Verify product was deleted from database
+      const deletedProduct = await prisma.product.findUnique({
         where: { id: testProductId },
       });
-      expect(product).not.toBeNull();
+      expect(deletedProduct).toBeNull();
+
+      // Verify order items referencing this product were also deleted
+      const orderItems = await prisma.orderItem.findMany({
+        where: { product_id: testProductId },
+      });
+      expect(orderItems).toHaveLength(0);
     });
   });
 });

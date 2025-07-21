@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import { listCategories } from 'controller/v1/category/listCategory';
-import { getCategoryById } from 'controller/v1/category/getCategoryById';
-import { listProducts } from 'controller/v1/product/listProducts';
-import { getProductDetails } from 'controller/v1/product/getProductDetails';
-import { createOrder } from 'controller/v1/order/createOrder';
-import { listUserOrders } from 'controller/v1/order/listUserOrders';
-import { getUserOrderById } from 'controller/v1/order/getUserOrderById';
-import { authenticateToken } from 'middleware/jwtUtility';
+import { listCategories } from '../controller/v1/category/listCategory';
+import { getCategoryById } from '../controller/v1/category/getCategoryById';
+import { listProducts } from '../controller/v1/product/listProducts';
+import { getProductDetails } from '../controller/v1/product/getProductDetails';
+import { createOrder } from '../controller/v1/order/createOrder';
+import { listUserOrders } from '../controller/v1/order/listUserOrders';
+import { getUserOrderById } from '../controller/v1/order/getUserOrderById';
+import { authenticateToken } from '../middleware/jwtUtility';
 
 const userRouter = Router();
 
