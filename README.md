@@ -4,11 +4,21 @@ A modern full-stack web application for managing a sweet shop with inventory, or
 
 ## Live Demo
 
-🌐 **Frontend**: [Sweet Shop App](https://sweet-shop-management-system-seven.vercel.app/)
-🔧 **Backend API**: [API Endpoints](https://sweet-shop-management-system-60d31ee24ccf.herokuapp.com/)
-test case video : [watch](https://drive.google.com/file/d/1w1QA_znjnw4m_jGzjYkgYeNmo6mTX85U/view?usp=sharing)
+🌐 <strong>Frontend</strong>: 
+<a href="https://sweet-shop-management-system-seven.vercel.app/" target="_blank" rel="noopener noreferrer">
+Sweet Shop App
+</a><br>
 
----
+🔧 <strong>Backend API</strong>: 
+<a href="https://sweet-shop-management-system-60d31ee24ccf.herokuapp.com/" target="_blank" rel="noopener noreferrer">
+API Endpoints
+</a><br>
+
+🎥 <strong>Test Case Video</strong>: 
+<a href="https://drive.google.com/file/d/1w1QA_znjnw4m_jGzjYkgYeNmo6mTX85U/view?usp=sharing" target="_blank" rel="noopener noreferrer">
+Watch
+</a>
+
 
 _Built with ❤️ using Test-Driven Development_
 
